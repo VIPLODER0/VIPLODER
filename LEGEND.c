@@ -49,7 +49,27 @@ void generate_payload(unsigned char *payload, int size) {
 // Function to perform triple AES encryption
 void encrypt_payload(const unsigned char *input, unsigned char *output, int size) {
     AES_KEY encryptKey;
-    AES_set_encrypt_key(AES_KEY, 256, &encryptKey);
+    
+#include <openssl/aes.h>
+#include <openssl/rand.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+void aes_encrypt(const unsigned char *plaintext, unsigned char *ciphertext, const unsigned char *key) {
+    AES_KEY encryptKey;
+
+    // Set the encryption key
+    if (AES_set_encrypt_key(key, 256, &encryptKey) < 0) {
+        fprintf(stderr, "Failed to set encryption key.
+");
+        exit(1);
+    }
+
+    // Encrypt the plaintext
+    AES_encrypt(plaintext, ciphertext, &encryptKey);
+}
+(AES_KEY, 256, &encryptKey);
     AES_cbc_encrypt(input, output, size, &encryptKey, (unsigned char *)AES_IV, AES_ENCRYPT);
     
     // Perform encryption twice more for added complexity
