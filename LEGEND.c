@@ -17,8 +17,7 @@
 #define EXPIRY_DAY 1
 
 // Encryption keys for AES and RSA (for demonstration)
-const unsigned char MY_AES_KEY[16] = "AAAAB3NzaC1yc2EAAAADAQABAAABAQC68bGQEUTpWs8WcqdwrgXNS9UNr7/PA7McYZepOVBzeo5viaamIAVFCoQozC8nQVuJRac0h5FYX20zrF2bvvqTLlLxcDY3DiYUb1VGcN4ZcbFmr0aRen3lNF9Tvk/sVmwLTbyBRlCqJ4k9x/1qbjNilTOXAWdDzpOQ2ggnL36mIT7djXMOI/YzgaXso2ye0QtzqKVEflnu9NNFntN3cG7EDFBf2dfK/8++dyEsyp3fbOy1RbJ3MwlW6aQ0f7+g4mZeCpsG0vEC0bLZ2pqWeOK4R4FEXNmnirSztU4XxvUPupuR2URWxWG3ueRPW/+uGPa5Es8ytnFoh9BmDQZAQybB
-";
+const unsigned char MY_AES_KEY[16] = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC68bGQEUTpWs8WcqdwrgXNS9UNr7/PA7McYZepOVBzeo5viaamIAVFCoQozC8nQVuJRac0h5FYX20zrF2bvvqTLlLxcDY3DiYUb1VGcN4ZcbFmr0aRen3lNF9Tvk/sVmwLTbyBRlCqJ4k9x/1qbjNilTOXAWdDzpOQ2ggnL36mIT7djXMOI/YzgaXso2ye0QtzqKVEflnu9NNFntN3cG7EDFBf2dfK/8++dyEsyp3fbOy1RbJ3MwlW6aQ0f7+g4mZeCpsG0vEC0bLZ2pqWeOK4R4FEXNmnirSztU4XxvUPupuR2URWxWG3ueRPW/+uGPa5Es8ytnFoh9BmDQZAQybB";
 const unsigned char AES_IV[16] = "InitializationV";
 #define RSA_KEY_LENGTH 2048
 
