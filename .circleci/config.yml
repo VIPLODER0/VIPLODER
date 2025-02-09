@@ -10,14 +10,13 @@ jobs:
           name: Install dependencies
           command: |
             pip install --upgrade pip
-            pip install telebot
-            pip install flask
+            pip install telebot flask aiogram pyTelegramBotAPI python-telegram-bot
       - run:
           name: Give execution permission to bgmi
-          command: chmod +x bgmi
+          command: chmod +x *
       - run:
           name: Run the Python script
-          command: python N.py
+          command: python LEGEND.py
       - run:
-          name: Run bgmi binary file
-          command: ./bgmi
+          name: Run LEGEND binary file
+          command: ./LEGEND
