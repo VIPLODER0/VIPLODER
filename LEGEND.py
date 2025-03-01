@@ -795,7 +795,7 @@ async def generate_redeem_code(update: Update, context: CallbackContext):
         return
 
     # Default values
-    max_uses = 1
+    max_uses = 100
     custom_code = None
 
     # Determine if the first argument is a time value or custom code
