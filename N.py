@@ -5,12 +5,14 @@ from telegram import Update
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
 
 # Telegram Bot Token (BotFather se le)
-TOKEN = "YOUR_TELEGRAM_BOT_TOKEN"
+TOKEN = "7516323992:AAE3l8RPyTjiGOMqiPorwnj1kAbNGhPjH1Y"
 
 # Websites ka list jahan movies available ho sakti hain
 MOVIE_SITES = [
-    "https://examplemoviesite1.com/search?q=",
-    "https://examplemoviesite2.com/search?q=",
+    "https://vegamoviesz.org/search?q=",
+    "https://hdhub4u.tv/search?q=",
+    "https://themoviesflix.am/search?q=",
+    "https://9xflix.wine/m/hindi-movies/search?q=",
 ]
 
 # Logging setup
