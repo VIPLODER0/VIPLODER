@@ -23,7 +23,7 @@ redeem_codes_collection = db['redeem_codes']
 attack_logs_collection = db['user_attack_logs']
 
 # Bot Configuration
-TELEGRAM_BOT_TOKEN = '7516323992:AAGG0zxrHC9IZK6rSqHU5_dnA3pz8tpJ6CA'
+TELEGRAM_BOT_TOKEN = '8012442954:AAGYA18FyGFXyHPRw_SLdMj8UHN_VJ4HAjw'
 ADMIN_USER_ID = 1929943036 
 ADMIN_USER_ID = 1929943036 
 FEEDBACK_CHAT_ID = 1929943036  # Yahan admin ka Telegram ID set karein
