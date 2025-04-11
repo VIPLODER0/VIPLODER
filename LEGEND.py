@@ -1278,7 +1278,7 @@ def main():
     application.add_handler(CommandHandler("ping", ping))
     application.add_handler(CommandHandler("info", info))
     application.add_handler(MessageHandler(filters.PHOTO, feedback))
-    application.add_handler(CommandHandler("broadcast", broadcast_message))
+    application.add_handler(CommandHandler("broadcast", broadcast))
     application.add_handler(CommandHandler("cleanup", cleanup))
     application.add_handler(CommandHandler("spin", spin))
     application.add_handler(CommandHandler("price", price))  # For users to see the promotional plan
