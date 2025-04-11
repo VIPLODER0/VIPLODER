@@ -314,7 +314,7 @@ async def help_command(update: Update, context: CallbackContext):
             "*Here are the commands you can use:* \n\n"
             "*🔸 /start* - start interacting with the bot.\n"
             "*🔸 /attack* - Trigger an attack operation.\n"
-            "*🔸 /plan* - bot plan.\n"
+            "*🔸 /price* - bot price.\n"
             "*🔸 /spin* - spin and wait for your luck.\n"
             "*🔸 /redeem* - Redeem a code.\n"
             "*🔸 /feedback* - send feedback to admin.\n"
@@ -334,7 +334,7 @@ async def help_command(update: Update, context: CallbackContext):
             "*🔸 /broadcast* - Broadcast a Message.\n"
             "*🔸 /gen* - Generate a redeem code.\n"
             "*🔸 /redeem* - Redeem a code.\n"
-            "*🔸 /plan* - bot plan.\n"
+            "*🔸 /price* - bot price.\n"
             "*🔸 /ping* - Check code.\n"
             "*🔸 /cleanup* - Clean up stored data.\n"
             "*🔸 /argument [type]* - Set the (3, 4, or 5).\n"
@@ -365,7 +365,7 @@ async def start(update: Update, context: CallbackContext):
         f"⚡ Welcome to the battlefield, *{username.upper()}*! ⚡\n\n"
         f"👤 *User ID:* `{user_id}`\n"
         f"🔴 *Status:* {status_emoji}\n\n"
-        f"💰 *Pricing for the bot services:* /plan"
+        f"💰 *Pricing for the bot services:* /price"
     )
 
     await context.bot.send_message(chat_id=chat_id, text=message, parse_mode='Markdown')
@@ -595,27 +595,21 @@ async def broadcast_message(update: Update, context: CallbackContext):
         parse_mode='Markdown'
     )
 # function to plan 
-async def plan(update: Update, context: CallbackContext):
-    user_id = update.effective_user.id
-    
-    # User ko promotional message dikhana agar unhone plan nahi liya
-    promotional_message = (
-        "❤️ 🔤🔤🔤🔤🔤 👑 𝗗𝗗𝗢𝗦 𝗕𝗢𝗧 𝗔𝗩𝗔𝗜𝗟𝗔𝗕𝗟𝗘 𝟐𝟒/𝟕  \n"
-        "𝐀𝐕𝐀𝐈𝐋𝐀𝐁𝐋𝐄 🔝\n\n"
-        "👑 𝟭 𝗗𝗔𝗬 :- 130₹ 💎\n"
-        "👑 𝟮 𝗗𝗔𝗬 :- 190₹ 💎\n"
-        "👑 𝟯 𝗗𝗔𝗬 :- 280₹ 💎\n"
-        "👑 𝟰 𝗗𝗔𝗬 :- 350₹ 💎\n"
-        "👑 𝟱 𝗗𝗔𝗬 :- 400₹ 💎\n"
-        "👑 𝟲 𝗗𝗔𝗬 :- 450₹ 💎\n"
-        "👑 𝟳 𝗗𝗔𝗬 :- 500₹ 💎\n\n"
-        "📱 𝐈𝐎𝐒 + 𝐀𝐍𝐃𝐑𝐎𝐈𝐃  𝐃𝐃𝐎𝗦 𝐀𝐕𝐀𝐈𝐋𝐀𝐁𝐋𝐄 ➡️✔️\n\n"
-        "💎 𝗗𝗠 𝗙𝗢𝗥 𝗕𝗨𝗬 :- \n"
-        "@NeoModEngine  @ALTAB_VIP"
+async def price(update: Update, context: CallbackContext):
+    price_message = (
+        "💸 *Bot Pricing Plans:*\n\n"
+        "👑 *1 DAY*  – 130₹ 💎\n"
+        "👑 *2 DAYS* – 190₹ 💎\n"
+        "👑 *3 DAYS* – 280₹ 💎\n"
+        "👑 *4 DAYS* – 350₹ 💎\n"
+        "👑 *5 DAYS* – 400₹ 💎\n"
+        "👑 *6 DAYS* – 450₹ 💎\n"
+        "👑 *7 DAYS* – 500₹ 💎\n\n"
+        "📱 *Available on:* IOS + Android\n\n"
+        "💬 *Contact to Buy:* @NeoModEngine  @ALTAB_VIP"
     )
 
-    await context.bot.send_message(chat_id=update.effective_chat.id, text=promotional_message, parse_mode='Markdown')
-    
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=price_message, parse_mode='Markdown')
 # Bot start hone ka time track karna
 BOT_START_TIME = time.time()
 
@@ -1235,7 +1229,7 @@ def main():
     application.add_handler(CommandHandler("broadcast", broadcast_message))
     application.add_handler(CommandHandler("cleanup", cleanup))
     application.add_handler(CommandHandler("spin", spin))
-    application.add_handler(CommandHandler("plan", plan))  # For users to see the promotional plan
+    application.add_handler(CommandHandler("price", price))  # For users to see the promotional plan
     application.add_handler(CommandHandler("argument", set_argument))
     application.add_handler(CommandHandler("status", status))
     application.add_handler(CommandHandler("delete_code", delete_code))
