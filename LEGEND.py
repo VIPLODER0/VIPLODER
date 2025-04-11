@@ -368,7 +368,7 @@ async def start(update: Update, context: CallbackContext):
         f"💰 *Pricing for the bot services:* /price"
     )
 
-    await context.bot.send_message(chat_id=chat_id, text=message, parse_mode='Markdown')
+    await context.bot.send_message(chat_id=chat_id, text=message, parse_mode='HTML')
 
 async def add_user(update: Update, context: CallbackContext):
     user_id = update.effective_user.id
@@ -609,7 +609,7 @@ async def price(update: Update, context: CallbackContext):
         "💬 *Contact to Buy:* @NeoModEngine  @ALTAB_VIP"
     )
 
-    await context.bot.send_message(chat_id=update.effective_chat.id, text=price_message, parse_mode='Markdown')
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=price_message, parse_mode='HTML')
 # Bot start hone ka time track karna
 BOT_START_TIME = time.time()
 
