@@ -600,7 +600,7 @@ async def plan(update: Update, context: CallbackContext):
     
     # User ko promotional message dikhana agar unhone plan nahi liya
     promotional_message = (
-        "🍥𝗗𝗗𝗢𝗦 𝗕𝗢𝗧 𝗔𝗩𝗔𝗜𝗟𝗔𝗕𝗟𝗘 𝟐𝟒/𝟕  \n"
+        "❤️ 🔤🔤🔤🔤🔤 👑 𝗗𝗗𝗢𝗦 𝗕𝗢𝗧 𝗔𝗩𝗔𝗜𝗟𝗔𝗕𝗟𝗘 𝟐𝟒/𝟕  \n"
         "𝐀𝐕𝐀𝐈𝐋𝐀𝐁𝐋𝐄 🔝\n\n"
         "👑 𝟭 𝗗𝗔𝗬 :- 130₹ 💎\n"
         "👑 𝟮 𝗗𝗔𝗬 :- 190₹ 💎\n"
