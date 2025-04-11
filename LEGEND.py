@@ -312,7 +312,7 @@ async def help_command(update: Update, context: CallbackContext):
         # Help text for regular users (exclude sensitive commands)
         help_text = (
             "*Here are the commands you can use:* \n\n"
-            "*🔸 /restart* - restart interacting with the bot.\n"
+            "*🔸 /start* - start interacting with the bot.\n"
             "*🔸 /attack* - Trigger an attack operation.\n"
             "*🔸 /plan* - bot plan.\n"
             "*🔸 /spin* - spin and wait for your luck.\n"
@@ -323,7 +323,7 @@ async def help_command(update: Update, context: CallbackContext):
         # Help text for admins (include sensitive commands)
         help_text = (
             "*💡 Available Commands for Admins:*\n\n"
-            "*🔸 /restart* - restart the bot.\n"
+            "*🔸 /start* - start the bot.\n"
             "*🔸 /attack* - Start the attack.\n"
             "*🔸 /add [user_id]* - Add a user.\n"
             "*🔸 /remove [user_id]* - Remove a user.\n"
@@ -349,7 +349,7 @@ async def help_command(update: Update, context: CallbackContext):
         )
     await context.bot.send_message(chat_id=update.effective_chat.id, text=help_text, parse_mode='Markdown')
 
-async def restart(update: Update, context: CallbackContext):
+async def start(update: Update, context: CallbackContext):
     chat_id = update.effective_chat.id
     user = update.effective_user
     user_id = user.id
@@ -1222,7 +1222,7 @@ async def cleanup(update: Update, context: CallbackContext):
 
 def main():
     application = Application.builder().token(TELEGRAM_BOT_TOKEN).build()
-    application.add_handler(CommandHandler("restart", restart))
+    application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("add", add_user))
     application.add_handler(CommandHandler("remove", remove_user))
     application.add_handler(CommandHandler("thread", set_thread))
