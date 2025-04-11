@@ -597,21 +597,20 @@ async def broadcast(update: Update, context: CallbackContext):
     )
 # function to plan 
 async def price(update: Update, context: CallbackContext):
-    
     message = (
-    "<b>💸 Bot Pricing Plans:</b><br><br>"
-    "👑 𝟭 𝗗𝗔𝗬 :- 130₹ 💎<br>"
-    "👑 𝟮 𝗗𝗔𝗬 :- 190₹ 💎<br>"
-    "👑 𝟯 𝗗𝗔𝗬 :- 280₹ 💎<br>"
-    "👑 𝟰 𝗗𝗔𝗬 :- 350₹ 💎<br>"
-    "👑 𝟱 𝗗𝗔𝗬 :- 400₹ 💎<br>"
-    "👑 𝟲 𝗗𝗔𝗬 :- 450₹ 💎<br>"
-    "👑 𝟳 𝗗𝗔𝗬 :- 500₹ 💎<br><br>"
-    "📱 <b>Available on:</b> IOS + Android<br><br>"
-    "💬 <b>Contact to Buy:</b> @NeoModEngine @ALTAB_VIP"
-)
+        "💸 *Bot Pricing Plans:*\n\n"
+        "👑 1 DAY – 130₹ 💎\n"
+        "👑 2 DAYS – 190₹ 💎\n"
+        "👑 3 DAYS – 280₹ 💎\n"
+        "👑 4 DAYS – 350₹ 💎\n"
+        "👑 5 DAYS – 400₹ 💎\n"
+        "👑 6 DAYS – 450₹ 💎\n"
+        "👑 7 DAYS – 500₹ 💎\n\n"
+        "📱 Available on: IOS + Android\n\n"
+        "💬 Contact to Buy: @NeoModEngine  @ALTAB_VIP"
+    )
 
-await context.bot.send_message(chat_id=update.effective_chat.id, text=message, parse_mode='HTML')
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=message, parse_mode='HTML')
 # Bot start hone ka time track karna
 BOT_START_TIME = time.time()
 
