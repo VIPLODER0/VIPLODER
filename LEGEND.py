@@ -315,6 +315,7 @@ async def help_command(update: Update, context: CallbackContext):
             "*🔸 /start* - start interacting with the bot.\n"
             "*🔸 /attack* - Trigger an attack operation.\n"
             "*🔸 /price* - bot price.\n"
+            "*🔸 /dailyreward* - dailyreward 1 free attack.\n"
             "*🔸 /info* - user info.\n"
             "*🔸 /spin* - spin and wait for your luck.\n"
             "*🔸 /redeem* - Redeem a code.\n"
@@ -743,6 +744,47 @@ async def info(update: Update, context: CallbackContext):
         )
 
     await context.bot.send_message(chat_id=update.effective_chat.id, text=msg, parse_mode='HTML')
+
+# function to 1 attack daily 
+
+async def dailyreward(update: Update, context: CallbackContext):
+    user = update.effective_user
+    user_id = user.id
+
+    now = datetime.now(timezone.utc)
+    user_data = users_collection.find_one({"user_id": user_id})
+
+    if not user_data:
+        users_collection.insert_one({
+            "user_id": user_id,
+            "last_reward": now - timedelta(days=1)
+        })
+        user_data = users_collection.find_one({"user_id": user_id})
+
+    last_claim = user_data.get("last_reward", now - timedelta(days=1))
+
+    # Cooldown logic: 24 hours
+    if (now - last_claim).total_seconds() < 86400:
+        remaining = timedelta(seconds=86400 - (now - last_claim).total_seconds())
+        hours = int(remaining.total_seconds() // 3600)
+        minutes = int((remaining.total_seconds() % 3600) // 240)
+        return await context.bot.send_message(
+            chat_id=user_id,
+            text=f"⏳ You already claimed your daily reward!\nCome back in {hours}h {minutes}m.",
+            parse_mode="HTML"
+        )
+
+    # Grant reward (you can customize what you give)
+    users_collection.update_one(
+        {"user_id": user_id},
+        {"$set": {"last_reward": now}}
+    )
+
+    await context.bot.send_message(
+        chat_id=user_id,
+        text="🎁 <b>Daily Reward Claimed!</b>\nYou've received 1 free 240-second attack today!\nUse it wisely!",
+        parse_mode="HTML"
+    )
 
 # Function to set the argument type for attack commands
 async def set_argument(update: Update, context: CallbackContext):
@@ -1276,6 +1318,7 @@ def main():
     application.add_handler(MessageHandler(filters.PHOTO, feedback))
     application.add_handler(CommandHandler("broadcast", broadcast))
     application.add_handler(CommandHandler("cleanup", cleanup))
+    application.add_handler(CommandHandler("dailyreward", dailyreward))
     application.add_handler(CommandHandler("spin", spin))
     application.add_handler(CommandHandler("price", price))  # For users to see the promotional plan
     application.add_handler(CommandHandler("argument", set_argument))
