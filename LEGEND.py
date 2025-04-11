@@ -23,7 +23,7 @@ redeem_codes_collection = db['redeem_codes']
 attack_logs_collection = db['user_attack_logs']
 
 # Bot Configuration
-TELEGRAM_BOT_TOKEN = '8012442954:AAEWQw49Zg6tbX8TG0MAw6jBm9PL8MIEBAw'
+TELEGRAM_BOT_TOKEN = '8012442954:AAGWgX-LRHTTaoyc88JZ8IRpp2Fuo7nns-Y'
 ADMIN_USER_ID = 1929943036 
 ADMIN_USER_ID = 1929943036 
 FEEDBACK_CHAT_ID = 1929943036  # Yahan admin ka Telegram ID set karein
@@ -597,24 +597,21 @@ async def broadcast(update: Update, context: CallbackContext):
     )
 # function to plan 
 async def price(update: Update, context: CallbackContext):
-    user = update.effective_user
-    username = user.username or user.first_name or "User"
-
+    
     message = (
-        f"👤 <b>{username.upper()}</b>, here are the plans for you:<br><br>"
-        "<b>💸 Bot Pricing Plans:</b><br><br>"
-        "👑 1 DAY –  130₹ 💎<br>"
-        "👑 2 DAYS – 190₹ 💎<br>"
-        "👑 3 DAYS – 280₹ 💎<br>"
-        "👑 4 DAYS – 350₹ 💎<br>"
-        "👑 5 DAYS – 400₹ 💎<br>"
-        "👑 6 DAYS – 450₹ 💎<br>"
-        "👑 7 DAYS – 500₹ 💎<br><br>"
-        "📱 <b>Available on:</b> IOS + Android<br><br>"
-        "💬 <b>Contact to Buy:</b> @NeoModEngine @ALTAB_VIP"
-    )
+    "<b>💸 Bot Pricing Plans:</b><br><br>"
+    "👑 𝟭 𝗗𝗔𝗬 :- 130₹ 💎<br>"
+    "👑 𝟮 𝗗𝗔𝗬 :- 190₹ 💎<br>"
+    "👑 𝟯 𝗗𝗔𝗬 :- 280₹ 💎<br>"
+    "👑 𝟰 𝗗𝗔𝗬 :- 350₹ 💎<br>"
+    "👑 𝟱 𝗗𝗔𝗬 :- 400₹ 💎<br>"
+    "👑 𝟲 𝗗𝗔𝗬 :- 450₹ 💎<br>"
+    "👑 𝟳 𝗗𝗔𝗬 :- 500₹ 💎<br><br>"
+    "📱 <b>Available on:</b> IOS + Android<br><br>"
+    "💬 <b>Contact to Buy:</b> @NeoModEngine @ALTAB_VIP"
+)
 
-    await context.bot.send_message(chat_id=update.effective_chat.id, text=message, parse_mode='HTML')
+await context.bot.send_message(chat_id=update.effective_chat.id, text=message, parse_mode='HTML')
 # Bot start hone ka time track karna
 BOT_START_TIME = time.time()
 
