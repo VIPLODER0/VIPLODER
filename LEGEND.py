@@ -23,7 +23,7 @@ redeem_codes_collection = db['redeem_codes']
 attack_logs_collection = db['user_attack_logs']
 
 # Bot Configuration
-TELEGRAM_BOT_TOKEN = '8012442954:AAGS3uK5o7OikBgsBDsq2azGe8Vj63BHY9Y'
+TELEGRAM_BOT_TOKEN = '8012442954:AAEWQw49Zg6tbX8TG0MAw6jBm9PL8MIEBAw'
 ADMIN_USER_ID = 1929943036 
 ADMIN_USER_ID = 1929943036 
 FEEDBACK_CHAT_ID = 1929943036  # Yahan admin ka Telegram ID set karein
@@ -315,6 +315,7 @@ async def help_command(update: Update, context: CallbackContext):
             "*🔸 /start* - start interacting with the bot.\n"
             "*🔸 /attack* - Trigger an attack operation.\n"
             "*🔸 /price* - bot price.\n"
+            "*🔸 /info* - user info.\n"
             "*🔸 /spin* - spin and wait for your luck.\n"
             "*🔸 /redeem* - Redeem a code.\n"
             "*🔸 /feedback* - send feedback to admin.\n"
@@ -549,67 +550,72 @@ async def is_user_allowed(user_id):
     return False
     
 #Function to broadcast messege 
-async def broadcast_message(update: Update, context: CallbackContext):
-    user_id = update.effective_user.id
+async def broadcast(update: Update, context: CallbackContext):
+    admin_id = update.effective_user.id
 
-    # Check if the user is admin
-    if user_id != ADMIN_USER_ID:
+    if admin_id != ADMIN_USER_ID:
         await context.bot.send_message(
-            chat_id=update.effective_chat.id, 
-            text="*❌ You are not authorized to broadcast messages!*", 
-            parse_mode='Markdown'
+            chat_id=update.effective_chat.id,
+            text="❌ You are not authorized to use this command!",
+            parse_mode='HTML'
         )
         return
 
-    # Ensure that the message is provided
     if not context.args:
         await context.bot.send_message(
-            chat_id=update.effective_chat.id, 
-            text="*⚠️ Please provide a message to broadcast!*", 
-            parse_mode='Markdown'
+            chat_id=update.effective_chat.id,
+            text="⚠️ Please provide a message to broadcast.\n\nUsage: /broadcast Your message here",
+            parse_mode='HTML'
         )
         return
 
-    # Get the message to broadcast
-    broadcast_message = ' '.join(context.args)
+    message_text = ' '.join(context.args)
 
-    # Fetch all users from the database
-    users = users_collection.find()
+    users = list(users_collection.find())
+    success, failed = 0, 0
 
-    # Send the broadcast message to each user
+    await context.bot.send_message(chat_id=admin_id, text=f"📢 Broadcasting message to {len(users)} users...", parse_mode='HTML')
+
     for user in users:
-        user_id = user['user_id']
         try:
+            chat_id = int(user.get("user_id"))
             await context.bot.send_message(
-                chat_id=user_id, 
-                text=f"🔊 *Broadcast Message:* \n\n{broadcast_message}", 
-                parse_mode='Markdown'
+                chat_id=chat_id,
+                text=f"👀 <b>Announcement:</b>\n\n{message_text}",
+                parse_mode='HTML'
             )
+            success += 1
+            await asyncio.sleep(0.4)  # Delay to avoid flood limit
         except Exception as e:
-            # If there is an error (e.g., user blocked the bot), log it
-            print(f"Failed to send broadcast to user {user_id}: {e}")
+            failed += 1
+            print(f"Failed to send to {user.get('user_id')}: {e}")
 
     await context.bot.send_message(
-        chat_id=update.effective_chat.id, 
-        text="*✅ Broadcast message has been sent to all users!*", 
-        parse_mode='Markdown'
+        chat_id=admin_id,
+        text=f"✅ Broadcast completed!\n\nSent: {success}\nFailed: {failed}",
+        parse_mode='HTML'
     )
 # function to plan 
 async def price(update: Update, context: CallbackContext):
-    price_message = (
-        "💸 *Bot Pricing Plans:*\n\n"
-        "👑 *1 DAY*  – 130₹ 💎\n"
-        "👑 *2 DAYS* – 190₹ 💎\n"
-        "👑 *3 DAYS* – 280₹ 💎\n"
-        "👑 *4 DAYS* – 350₹ 💎\n"
-        "👑 *5 DAYS* – 400₹ 💎\n"
-        "👑 *6 DAYS* – 450₹ 💎\n"
-        "👑 *7 DAYS* – 500₹ 💎\n\n"
-        "📱 *Available on:* IOS + Android\n\n"
-        "💬 *Contact to Buy:* @NeoModEngine  @ALTAB_VIP"
+async def price(update: Update, context: CallbackContext):
+    user = update.effective_user
+    username = user.username or user.first_name or "User"
+
+    message = (
+        f"👤 <b>{username.upper()}</b>, here are the plans for you:<br><br>"
+        "<b>💸 Bot Pricing Plans:</b><br><br>"
+        "👑 1 DAY –  130₹ 💎<br>"
+        "👑 2 DAYS – 190₹ 💎<br>"
+        "👑 3 DAYS – 280₹ 💎<br>"
+        "👑 4 DAYS – 350₹ 💎<br>"
+        "👑 5 DAYS – 400₹ 💎<br>"
+        "👑 6 DAYS – 450₹ 💎<br>"
+        "👑 7 DAYS – 500₹ 💎<br><br>"
+        "📱 <b>Available on:</b> IOS + Android<br><br>"
+        "💬 <b>Contact to Buy:</b> @NeoModEngine @ALTAB_VIP"
     )
 
-    await context.bot.send_message(chat_id=update.effective_chat.id, text=price_message, parse_mode='HTML')
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=message, parse_mode='HTML')
 # Bot start hone ka time track karna
 BOT_START_TIME = time.time()
 
@@ -696,6 +702,52 @@ async def spin(update: Update, context: CallbackContext):
     await message.edit_text(f"🎉 *Your Spin Result:*\n\n{final_result}", parse_mode="Markdown")
 
     await update.message.reply_text("📸 Please take a screenshot of this plan and send it to admin @NeoModEngine @ALTAB_VIP.")
+
+# function to check users info
+async def info(update: Update, context: CallbackContext):
+    user = update.effective_user
+    user_id = user.id
+    username = user.username or user.first_name or "User"
+
+    user_data = users_collection.find_one({"user_id": user_id})
+
+    if user_data and "expiry_date" in user_data:
+        expiry = user_data["expiry_date"]
+
+        # Ensure timezone-aware
+        if expiry.tzinfo is None:
+            expiry = expiry.replace(tzinfo=timezone.utc)
+
+        now = datetime.now(timezone.utc)
+        remaining = expiry - now
+
+        if remaining.total_seconds() > 0:
+            days = remaining.days
+            hours = remaining.seconds // 3600
+            minutes = (remaining.seconds % 3600) // 60
+            status = "🟢 Approved"
+        else:
+            days = hours = minutes = 0
+            status = "🔴 Expired"
+
+        expiry_str = expiry.strftime('%Y-%m-%d %H:%M')
+
+        msg = (
+            f"👤 <b>Username:</b> @{username}\n"
+            f"🆔 <b>User ID:</b> <code>{user_id}</code>\n"
+            f"🔐 <b>Status:</b> {status}\n"
+            f"📅 <b>Expires At:</b> {expiry_str}\n"
+            f"⏳ <b>Time Left:</b> {days}d {hours}h {minutes}m"
+        )
+    else:
+        msg = (
+            f"👤 <b>Username:</b> @{username}\n"
+            f"🆔 <b>User ID:</b> <code>{user_id}</code>\n"
+            f"🔐 <b>Status:</b> ⚠️ Not Approved\n"
+            f"💡 Use /redeem to activate your plan."
+        )
+
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=msg, parse_mode='HTML')
 
 # Function to set the argument type for attack commands
 async def set_argument(update: Update, context: CallbackContext):
@@ -1225,6 +1277,7 @@ def main():
     application.add_handler(CommandHandler("redeem", redeem_code))
     application.add_handler(CommandHandler("help", help_command))
     application.add_handler(CommandHandler("ping", ping))
+    application.add_handler(CommandHandler("info", info))
     application.add_handler(MessageHandler(filters.PHOTO, feedback))
     application.add_handler(CommandHandler("broadcast", broadcast_message))
     application.add_handler(CommandHandler("cleanup", cleanup))
