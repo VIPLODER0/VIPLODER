@@ -597,7 +597,6 @@ async def broadcast(update: Update, context: CallbackContext):
     )
 # function to plan 
 async def price(update: Update, context: CallbackContext):
-async def price(update: Update, context: CallbackContext):
     user = update.effective_user
     username = user.username or user.first_name or "User"
 
