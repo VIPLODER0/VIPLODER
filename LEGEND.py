@@ -312,7 +312,7 @@ async def help_command(update: Update, context: CallbackContext):
         # Help text for regular users (exclude sensitive commands)
         help_text = (
             "*Here are the commands you can use:* \n\n"
-            "*🔸 /start* - Start interacting with the bot.\n"
+            "*🔸 /restart* - restart interacting with the bot.\n"
             "*🔸 /attack* - Trigger an attack operation.\n"
             "*🔸 /plan* - bot plan.\n"
             "*🔸 /spin* - spin and wait for your luck.\n"
@@ -323,7 +323,7 @@ async def help_command(update: Update, context: CallbackContext):
         # Help text for admins (include sensitive commands)
         help_text = (
             "*💡 Available Commands for Admins:*\n\n"
-            "*🔸 /start* - Start the bot.\n"
+            "*🔸 /restart* - restart the bot.\n"
             "*🔸 /attack* - Start the attack.\n"
             "*🔸 /add [user_id]* - Add a user.\n"
             "*🔸 /remove [user_id]* - Remove a user.\n"
@@ -349,20 +349,24 @@ async def help_command(update: Update, context: CallbackContext):
         )
     await context.bot.send_message(chat_id=update.effective_chat.id, text=help_text, parse_mode='Markdown')
 
-async def start(update: Update, context: CallbackContext):
+async def restart(update: Update, context: CallbackContext):
     chat_id = update.effective_chat.id
-    user_id = update.effective_user.id 
+    user = update.effective_user
+    user_id = user.id
+    username = user.username or "Unknown"
 
     # Check if the user is allowed to use the bot
-    if not await is_user_allowed(user_id):
-        await context.bot.send_message(chat_id=chat_id, text="*❌ You are not authorized to use this bot!*", parse_mode='Markdown')
-        return
+    is_allowed = await is_user_allowed(user_id)
+
+    status_emoji = "🟢 Approved" if is_allowed else "⚠️ Not Approved"
 
     message = (
-        "*🔥 Welcome to the battlefield! 🔥*\n\n"
-        "*Use /attack <ip> <port> <duration>*\n"
-        "*Let the war begin! ⚔️💥*"
+        f"⚡ Welcome to the battlefield, *{username.upper()}*! ⚡\n\n"
+        f"👤 *User ID:* `{user_id}`\n"
+        f"🔴 *Status:* {status_emoji}\n\n"
+        f"💰 *Pricing for the bot services:* /plan"
     )
+
     await context.bot.send_message(chat_id=chat_id, text=message, parse_mode='Markdown')
 
 async def add_user(update: Update, context: CallbackContext):
@@ -595,7 +599,7 @@ async def plan(update: Update, context: CallbackContext):
     
     # User ko promotional message dikhana agar unhone plan nahi liya
     promotional_message = (
-        "❤️ 🔤🔤🔤🔤🔤 👑 𝗗𝗗𝗢𝗦 𝗕𝗢𝗧 𝗔𝗩𝗔𝗜𝗟𝗔𝗕𝗟𝗘 𝟐𝟒/𝟕  \n"
+        "🍥𝗗𝗗𝗢𝗦 𝗕𝗢𝗧 𝗔𝗩𝗔𝗜𝗟𝗔𝗕𝗟𝗘 𝟐𝟒/𝟕  \n"
         "𝐀𝐕𝐀𝐈𝐋𝐀𝐁𝐋𝐄 🔝\n\n"
         "👑 𝟭 𝗗𝗔𝗬 :- 130₹ 💎\n"
         "👑 𝟮 𝗗𝗔𝗬 :- 190₹ 💎\n"
@@ -606,7 +610,7 @@ async def plan(update: Update, context: CallbackContext):
         "👑 𝟳 𝗗𝗔𝗬 :- 500₹ 💎\n\n"
         "📱 𝐈𝐎𝐒 + 𝐀𝐍𝐃𝐑𝐎𝐈𝐃  𝐃𝐃𝐎𝗦 𝐀𝐕𝐀𝐈𝐋𝐀𝐁𝐋𝐄 ➡️✔️\n\n"
         "💎 𝗗𝗠 𝗙𝗢𝗥 𝗕𝗨𝗬 :- \n"
-        "@NeoModEngine  @MRSHAILU01"
+        "@NeoModEngine  @ALTAB_VIP"
     )
 
     await context.bot.send_message(chat_id=update.effective_chat.id, text=promotional_message, parse_mode='Markdown')
@@ -700,7 +704,7 @@ async def spin(update: Update, context: CallbackContext):
 
     await message.edit_text(f"🎉 *Your Spin Result:*\n\n{final_result}", parse_mode="Markdown")
 
-    await update.message.reply_text("📸 Please take a screenshot of this plan and send it to admin @NeoModEngine @MRSHAILU01.")
+    await update.message.reply_text("📸 Please take a screenshot of this plan and send it to admin @NeoModEngine @ALTAB_VIP.")
 
 # Function to set the argument type for attack commands
 async def set_argument(update: Update, context: CallbackContext):
@@ -1218,7 +1222,7 @@ async def cleanup(update: Update, context: CallbackContext):
 
 def main():
     application = Application.builder().token(TELEGRAM_BOT_TOKEN).build()
-    application.add_handler(CommandHandler("start", start))
+    application.add_handler(CommandHandler("restart", restart))
     application.add_handler(CommandHandler("add", add_user))
     application.add_handler(CommandHandler("remove", remove_user))
     application.add_handler(CommandHandler("thread", set_thread))
