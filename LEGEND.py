@@ -616,10 +616,6 @@ async def plan(update: Update, context: CallbackContext):
 
     await context.bot.send_message(chat_id=update.effective_chat.id, text=promotional_message, parse_mode='Markdown')
     
-    import psutil
-import time
-from datetime import timedelta
-
 # Bot start hone ka time track karna
 BOT_START_TIME = time.time()
 
