@@ -601,15 +601,15 @@ async def broadcast(update: Update, context: CallbackContext):
 async def price(update: Update, context: CallbackContext):
     message = (
         "💸 *Bot Pricing Plans:*\n\n"
-        "👑 1 DAY – 130₹ 💎\n"
-        "👑 2 DAYS – 190₹ 💎\n"
-        "👑 3 DAYS – 280₹ 💎\n"
-        "👑 4 DAYS – 350₹ 💎\n"
-        "👑 5 DAYS – 400₹ 💎\n"
-        "👑 6 DAYS – 450₹ 💎\n"
-        "👑 7 DAYS – 500₹ 💎\n\n"
+        "👑 1 DAY –  120₹ 💎\n"
+        "👑 2 DAYS – 200₹ 💎\n"
+        "👑 3 DAYS – 300₹ 💎\n"
+        "👑 4 DAYS – 400₹ 💎\n"
+        "👑 5 DAYS – 500₹ 💎\n"
+        "👑 6 DAYS – 600₹ 💎\n"
+        "👑 7 DAYS – 700₹ 💎\n\n"
         "📱 Available on: IOS + Android\n\n"
-        "💬 Contact to Buy: @NeoModEngine  @ALTAB_VIP"
+        "💬 Contact to Buy: @NeoModEngine "
     )
 
     await context.bot.send_message(chat_id=update.effective_chat.id, text=message, parse_mode='HTML')
@@ -670,12 +670,12 @@ async def ping(update: Update, context: CallbackContext):
     await message.edit_text(f"🏓 Pong! `{int(latency)}ms`", parse_mode="Markdown")
 
 plans = [
-    "👑 𝟭 𝗗𝗔𝗬 :- 80₹ 💎",
-    "👑 𝟮 𝗗𝗔𝗬 :- 160₹ 💎",
-    "👑 𝟯 𝗗𝗔𝗬 :- 250₹ 💎",
-    "👑 𝟰 𝗗𝗔𝗬 :- 300₹ 💎",
-    "👑 𝟱 𝗗𝗔𝗬 :- 480₹ 💎",
-    "👑 𝟲 𝗗𝗔𝗬 :- 500₹ 💎",
+    "👑 𝟭 𝗗𝗔𝗬 :- 100₹ 💎",
+    "👑 𝟮 𝗗𝗔𝗬 :- 200₹ 💎",
+    "👑 𝟯 𝗗𝗔𝗬 :- 300₹ 💎",
+    "👑 𝟰 𝗗𝗔𝗬 :- 400₹ 💎",
+    "👑 𝟱 𝗗𝗔𝗬 :- 500₹ 💎",
+    "👑 𝟲 𝗗𝗔𝗬 :- 600₹ 💎",
     "👑 FREE :- 1 HOURS 💎"
 ]
 
