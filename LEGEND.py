@@ -333,6 +333,7 @@ async def help_command(update: Update, context: CallbackContext):
             "*🔸 /byte [size]* - Set the byte size.\n"
             "*🔸 /show* - Show current settings.\n"
             "*🔸 /users* - List all allowed users.\n"
+            "*🔸 /user_info* - user info.\n"
             "*🔸 /broadcast* - Broadcast a Message.\n"
             "*🔸 /gen* - Generate a redeem code.\n"
             "*🔸 /redeem* - Redeem a code.\n"
@@ -785,6 +786,57 @@ async def dailyreward(update: Update, context: CallbackContext):
         text="🎁 <b>Daily Reward Claimed!</b>\nYou've received 1 free 240-second attack today!\nUse it wisely!",
         parse_mode="HTML"
     )
+# user info 
+# Function to get user information
+async def user_info(update: Update, context: CallbackContext):
+    user_id = update.effective_user.id
+    if user_id != ADMIN_USER_ID:
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text="❌ *You are not authorized to use this command!*",
+            parse_mode='Markdown'
+        )
+        return
+
+    if len(context.args) != 1:
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text="⚠️ *Usage: /user_info <user_id>*",
+            parse_mode='Markdown'
+        )
+        return
+
+    try:
+        target_user_id = int(context.args[0])
+        user = users_collection.find_one({"user_id": target_user_id})
+        if not user:
+            await context.bot.send_message(
+                chat_id=update.effective_chat.id,
+                text="❌ *User not found in the database.*",
+                parse_mode='Markdown'
+            )
+            return
+
+        expiry_date = user.get("expiry_date")
+        if expiry_date.tzinfo is None:
+            expiry_date = expiry_date.replace(tzinfo=timezone.utc)
+
+        remaining = expiry_date - datetime.now(timezone.utc)
+        remaining_str = f"{remaining.days}D-{remaining.seconds // 3600}H-{(remaining.seconds % 3600) // 60}M"
+
+        message = (
+            f"👤 *User Info:*\n"
+            f"• *User ID:* `{target_user_id}`\n"
+            f"• *Expiry Date:* {expiry_date.strftime('%Y-%m-%d %H:%M %Z')}\n"
+            f"• *Time Remaining:* {remaining_str}"
+        )
+        await context.bot.send_message(chat_id=update.effective_chat.id, text=message, parse_mode='Markdown')
+    except ValueError:
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text="⚠️ *Invalid user ID provided.*",
+            parse_mode='Markdown'
+        )
 
 # Function to set the argument type for attack commands
 async def set_argument(update: Update, context: CallbackContext):
@@ -1316,6 +1368,7 @@ def main():
     application.add_handler(CommandHandler("ping", ping))
     application.add_handler(CommandHandler("info", info))
     application.add_handler(MessageHandler(filters.PHOTO, feedback))
+    application.add_handler(CommandHandler("user_info", user_info))
     application.add_handler(CommandHandler("broadcast", broadcast))
     application.add_handler(CommandHandler("cleanup", cleanup))
     application.add_handler(CommandHandler("dailyreward", dailyreward))
