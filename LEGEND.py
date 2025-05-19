@@ -553,50 +553,96 @@ async def is_user_allowed(user_id):
     
 #Function to broadcast messege 
 async def broadcast(update: Update, context: CallbackContext):
-    admin_id = update.effective_user.id
-
-    if admin_id != ADMIN_USER_ID:
+async def broadcast(update: Update, context: CallbackContext):
+    user_id = update.effective_user.id
+    if user_id != ADMIN_USER_ID:
         await context.bot.send_message(
             chat_id=update.effective_chat.id,
-            text="❌ You are not authorized to use this command!",
-            parse_mode='HTML'
+            text="*❌ You are not authorized to broadcast messages!*",
+            parse_mode='Markdown'
         )
         return
 
-    if not context.args:
-        await context.bot.send_message(
-            chat_id=update.effective_chat.id,
-            text="⚠️ Please provide a message to broadcast.\n\nUsage: /broadcast Your message here",
-            parse_mode='HTML'
-        )
-        return
+    # Check if the message is a reply to a photo, video, or contains text
+    if update.message.reply_to_message:
+        reply_message = update.message.reply_to_message
+        caption = reply_message.caption or "Broadcast Message"
+        users = users_collection.find()
 
-    message_text = ' '.join(context.args)
+        if reply_message.photo:
+            photo = reply_message.photo[-1].file_id
+            for user in users:
+                user_id = user['user_id']
+                try:
+                    await context.bot.send_photo(
+                        chat_id=user_id,
+                        photo=photo,
+                        caption=f"🔊 *Broadcast Message:*\n\n{caption}",
+                        parse_mode='Markdown'
+                    )
+                except Exception as e:
+                    print(f"Failed to send photo broadcast to user {user_id}: {e}")
 
-    users = list(users_collection.find())
-    success, failed = 0, 0
-
-    await context.bot.send_message(chat_id=admin_id, text=f"📢 Broadcasting message to {len(users)} users...", parse_mode='HTML')
-
-    for user in users:
-        try:
-            chat_id = int(user.get("user_id"))
             await context.bot.send_message(
-                chat_id=chat_id,
-                text=f"👀 <b>Announcement:</b>\n\n{message_text}",
-                parse_mode='HTML'
+                chat_id=update.effective_chat.id,
+                text="*✅ Broadcast photo sent to all users!*",
+                parse_mode='Markdown'
             )
-            success += 1
-            await asyncio.sleep(0.4)  # Delay to avoid flood limit
-        except Exception as e:
-            failed += 1
-            print(f"Failed to send to {user.get('user_id')}: {e}")
 
-    await context.bot.send_message(
-        chat_id=admin_id,
-        text=f"✅ Broadcast completed!\n\nSent: {success}\nFailed: {failed}",
-        parse_mode='HTML'
-    )
+        elif reply_message.video:
+            video = reply_message.video.file_id
+            for user in users:
+                user_id = user['user_id']
+                try:
+                    await context.bot.send_video(
+                        chat_id=user_id,
+                        video=video,
+                        caption=f"🔊 *Broadcast Message:*\n\n{caption}",
+                        parse_mode='Markdown'
+                    )
+                except Exception as e:
+                    print(f"Failed to send video broadcast to user {user_id}: {e}")
+
+            await context.bot.send_message(
+                chat_id=update.effective_chat.id,
+                text="*✅ Broadcast video sent to all users!*",
+                parse_mode='Markdown'
+            )
+
+        else:
+            await context.bot.send_message(
+                chat_id=update.effective_chat.id,
+                text="*⚠️ Please reply to a photo or video message with /broadcast.*",
+                parse_mode='Markdown'
+            )
+
+    elif context.args:
+        broadcast_message = ' '.join(context.args)
+        users = users_collection.find()
+
+        for user in users:
+            user_id = user['user_id']
+            try:
+                await context.bot.send_message(
+                    chat_id=user_id,
+                    text=f"🔊 *Broadcast Message:*\n\n{broadcast_message}",
+                    parse_mode='Markdown'
+                )
+            except Exception as e:
+                print(f"Failed to send broadcast to user {user_id}: {e}")
+
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text="*✅ Broadcast message sent to all users!*",
+            parse_mode='Markdown'
+        )
+
+    else:
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text="*⚠️ Usage: /broadcast <message> or reply to a photo/video with /broadcast.*",
+            parse_mode='Markdown'
+        )
 # function to plan 
 async def price(update: Update, context: CallbackContext):
     message = (
@@ -609,7 +655,7 @@ async def price(update: Update, context: CallbackContext):
         "👑 6 DAYS – 600₹ 💎\n"
         "👑 7 DAYS – 700₹ 💎\n\n"
         "📱 Available on: IOS + Android\n\n"
-        "💬 Contact to Buy: @NeoModEngine "
+        "💬 Contact to Buy: @Jon00897 "
     )
 
     await context.bot.send_message(chat_id=update.effective_chat.id, text=message, parse_mode='HTML')
@@ -698,7 +744,7 @@ async def spin(update: Update, context: CallbackContext):
 
     await message.edit_text(f"🎉 *Your Spin Result:*\n\n{final_result}", parse_mode="Markdown")
 
-    await update.message.reply_text("📸 Please take a screenshot of this plan and send it to admin @NeoModEngine @ALTAB_VIP.")
+    await update.message.reply_text("📸 Please take a screenshot of this plan and send it to admin @Jon00897.")
 
 # function to check users info
 async def info(update: Update, context: CallbackContext):
