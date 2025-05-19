@@ -553,7 +553,6 @@ async def is_user_allowed(user_id):
     
 #Function to broadcast messege 
 async def broadcast(update: Update, context: CallbackContext):
-async def broadcast(update: Update, context: CallbackContext):
     user_id = update.effective_user.id
     if user_id != ADMIN_USER_ID:
         await context.bot.send_message(
