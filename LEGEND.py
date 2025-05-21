@@ -21,6 +21,8 @@ users_collection = db['users']
 settings_collection = db['settings']  # A new collection to store global settings
 redeem_codes_collection = db['redeem_codes']
 attack_logs_collection = db['user_attack_logs']
+# Database Configuration
+allowed_groups_collection = db['allowed_groups']  # New collection for allowed groups
 
 # Bot Configuration
 TELEGRAM_BOT_TOKEN = '8012442954:AAEeWJ4wyOgCcZr6FoDsq9VrNgkFq8t2VYI'
@@ -214,7 +216,77 @@ async def upload(update: Update, context: CallbackContext):
         text=f"✅ *File '{file_name}' has been uploaded successfully!*",
         parse_mode='Markdown'
     )
+# group me bot on 
+async def is_group_allowed(group_id):
+    group = allowed_groups_collection.find_one({"group_id": group_id})
+    if group:
+        expiry_date = group['expiry_date']
+        if expiry_date.tzinfo is None:
+            expiry_date = expiry_date.replace(tzinfo=timezone.utc)
+        if expiry_date > datetime.now(timezone.utc):
+            return True
+    return False
 
+async def add_group(update: Update, context: CallbackContext):
+    user_id = update.effective_user.id
+    if user_id != ADMIN_USER_ID:
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text="*❌ You are not authorized to add groups!*",
+            parse_mode='Markdown'
+        )
+        return
+
+    if len(context.args) != 2:
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text="*⚠️ Usage: /addgroup <group_id> <days/minutes>*",
+            parse_mode='Markdown'
+        )
+        return
+
+    try:
+        target_group_id = int(context.args[0])
+        time_input = context.args[1]
+
+        # Extract numeric value and unit from the input
+        if time_input[-1].lower() == 'd':
+            time_value = int(time_input[:-1])
+            total_seconds = time_value * 86400
+            expiry_label = f"{time_value} day(s)"
+        elif time_input[-1].lower() == 'm':
+            time_value = int(time_input[:-1])
+            total_seconds = time_value * 60
+            expiry_label = f"{time_value} minute(s)"
+        else:
+            await context.bot.send_message(
+                chat_id=update.effective_chat.id,
+                text="*⚠️ Please specify time in days (d) or minutes (m).*",
+                parse_mode='Markdown'
+            )
+            return
+
+        expiry_date = datetime.now(timezone.utc) + timedelta(seconds=total_seconds)
+
+        # Add or update group in the database
+        allowed_groups_collection.update_one(
+            {"group_id": target_group_id},
+            {"$set": {"expiry_date": expiry_date}},
+            upsert=True
+        )
+
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text=f"*✅ Group {target_group_id} added with expiry in {expiry_label}.*",
+            parse_mode='Markdown'
+        )
+
+    except ValueError as e:
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text=f"*⚠️ Error: {e}*",
+            parse_mode='Markdown'
+        )
 
 # Function to list files in a directory
 async def list_files(update: Update, context: CallbackContext):
@@ -337,6 +409,7 @@ async def help_command(update: Update, context: CallbackContext):
             "*🔸 /broadcast* - Broadcast a Message.\n"
             "*🔸 /gen* - Generate a redeem code.\n"
             "*🔸 /redeem* - Redeem a code.\n"
+            "*🔸 /addgroup* - addgroup.\n"
             "*🔸 /price* - bot price.\n"
             "*🔸 /ping* - Check code.\n"
             "*🔸 /cleanup* - Clean up stored data.\n"
@@ -1420,6 +1493,7 @@ def main():
     application.add_handler(CommandHandler("spin", spin))
     application.add_handler(CommandHandler("price", price))  # For users to see the promotional plan
     application.add_handler(CommandHandler("argument", set_argument))
+    application.add_handler(CommandHandler("addgroup", addgroup))
     application.add_handler(CommandHandler("status", status))
     application.add_handler(CommandHandler("delete_code", delete_code))
     application.add_handler(CommandHandler("list_codes", list_codes))
