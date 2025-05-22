@@ -636,65 +636,108 @@ async def list_users(update: Update, context: CallbackContext):
 
             if not expiry_date or not isinstance(expiry_date, datetime):
                 expiry_label = "Invalid Date"
-                expired = True
-            else:
-                if expiry_date.tzinfo is None:
-                    expiry_date = expiry_date.replace(tzinfo=timezone.utc)
-                expiry_date_local = expiry_date.astimezone(LOCAL_TIMEZONE)
-                expiry_label = expiry_date_local.strftime("%Y-%m-%d %H:%M:%S %Z")
-                time_remaining = expiry_date - current_time
-                if time_remaining.total_seconds() < 0:
-                    expiry_label += " (Expired)"
-                    expired = True
-                else:
-                    days = time_remaining.days
-                    hours = time_remaining.seconds // 3600
-                    minutes = (time_remaining.seconds // 60) % 60
-                    expiry_label += f" ({days}D-{hours}H-{minutes}M remaining)"
-                    expired = False
-
-            status = "🔴" if expired else "🟢"
-            user_list_message += (
-                f"{status} *User ID*: {user_id}\n"
-                f"   *Name*: {user_name}\n"
-                f"   *Expiry*: {expiry_label}\n\n"
-            )
-
-            if len(user_list_message) > 3500:
-                print(f"[DEBUG] Sending message chunk due to length: {len(user_list_message)}")
-                await context.bot.send_message(
-                    chat_id=chat_id,
-                    text=user_list_message,
-                    parse_mode='Markdown'
-                )
-                user_list_message = "👥 *User List (Continued):*\n\n"
-
-        if user_list_message != "👥 *User List (Continued):*\n\n":
-            print(f"[DEBUG] Sending final message, length: {len(user_list_message)}")
-            await context.bot.send_message(
-                chat_id=chat_id,
-                text=user_list_message,
-                parse_mode='Markdown'
-            )
-
-    except Exception as e:
-        print(f"[ERROR] Failed to fetch users: {str(e)}")
-        await context.bot.send_message(
-            chat_id=chat_id,
-            text=f"*❌ Error fetching user list: {str(e)}*",
-            parse_mode='Markdown'
-        )
+async def list_users(update, context):
+async def list_users(update, context):
+    current_time = datetime.now(timezone.utc)
+    users = users_collection.find() 
     
-#Function to broadcast messege 
-async def broadcast(update: Update, context: CallbackContext):
+    user_list_message = "👥 User List:\n"
+    
+    for user in users:
+        user_id = user['user_id']
+        expiry_date = user['expiry_date']
+        if expiry_date.tzinfo is None:
+            expiry_date = expiry_date.replace(tzinfo=timezone.utc)
+    
+        time_remaining = expiry_date - current_time
+        if time_remaining.days < 0:
+            remaining_days = -0
+            remaining_hours = 0
+            remaining_minutes = 0
+            expired = True  
+        else:
+            remaining_days = time_remaining.days
+            remaining_hours = time_remaining.seconds // 3600
+            remaining_minutes = (time_remaining.seconds // 60) % 60
+            expired = False 
+        
+        expiry_label = f"{remaining_days}D-{remaining_hours}H-{remaining_minutes}M"
+        if expired:
+            user_list_message += f"🔴 *User ID: {user_id} - Expiry: {expiry_label}*\n"
+        else:
+            user_list_message += f"🟢 User ID: {user_id} - Expiry: {expiry_label}\n"
+
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=user_list_message, parse_mode='Markdown')
+
+async def is_user_allowed(user_id):
+    user = users_collection.find_one({"user_id": user_id})
+    if user:
+        expiry_date = user['expiry_date']
+        if expiry_date:
+            # Ensure expiry_date is timezone-aware
+            if expiry_date.tzinfo is None:
+                expiry_date = expiry_date.replace(tzinfo=timezone.utc)
+            # Compare with the current time
+            if expiry_date > datetime.now(timezone.utc):
+                return True
+    return False
+
+
+    
+# Function to broadcast a message to all users
+async def broadcast_message(update: Update, context: CallbackContext):
     user_id = update.effective_user.id
+
+    # Ensure only the admin can use this command
     if user_id != ADMIN_USER_ID:
         await context.bot.send_message(
-            chat_id=update.effective_chat.id,
-            text="*❌ You are not authorized to broadcast messages!*",
+            chat_id=update.effective_chat.id, 
+            text="*❌ You are not authorized to broadcast messages!*", 
             parse_mode='Markdown'
         )
         return
+
+    # Ensure a message is provided
+    if not context.args:
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id, 
+            text="*⚠️ Usage: /broadcast <message>*", 
+            parse_mode='Markdown'
+        )
+        return
+
+    # Get the broadcast message
+    broadcast_message = ' '.join(context.args)
+
+    # Retrieve all user IDs from the database
+    users = users_collection.find({}, {"user_id": 1})  # Fetch only the `user_id` field
+
+    success_count = 0
+    failure_count = 0
+
+    for user in users:
+        try:
+            user_id = user['user_id']
+            await context.bot.send_message(
+                chat_id=user_id, 
+                text=f"*📢 Broadcast Message:*\n\n{broadcast_message}", 
+                parse_mode='Markdown'
+            )
+            success_count += 1
+        except Exception as e:
+            print(f"Failed to send message to user {user_id}: {str(e)}")
+            failure_count += 1
+
+    # Send summary to the admin
+    await context.bot.send_message(
+        chat_id=update.effective_chat.id, 
+        text=(
+            f"*✅ Broadcast completed!*\n\n"
+            f"*📬 Successful:* {success_count}\n"
+            f"*⚠️ Failed:* {failure_count}\n"
+        ),
+        parse_mode='Markdown'
+    )
 
     # Check if the message is a reply to a photo, video, or contains text
     if update.message.reply_to_message:
@@ -779,7 +822,7 @@ async def broadcast(update: Update, context: CallbackContext):
 # function to plan 
 async def price(update: Update, context: CallbackContext):
     message = (
-        "💸 *Bot Pricing Plans:*\n\n"
+        "💸 Bot Pricing Plans:\n\n"
         "👑 1 DAY –  120₹ 💎\n"
         "👑 2 DAYS – 200₹ 💎\n"
         "👑 3 DAYS – 300₹ 💎\n"
@@ -1548,7 +1591,7 @@ def main():
     application.add_handler(CommandHandler("info", info))
     application.add_handler(MessageHandler(filters.PHOTO, feedback))
     application.add_handler(CommandHandler("user_info", user_info))
-    application.add_handler(CommandHandler("broadcast", broadcast))
+    application.add_handler(CommandHandler("broadcast", broadcast_message))
     application.add_handler(CommandHandler("cleanup", cleanup))
     application.add_handler(CommandHandler("dailyreward", dailyreward))
     application.add_handler(CommandHandler("spin", spin))
