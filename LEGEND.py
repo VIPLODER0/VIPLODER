@@ -25,7 +25,7 @@ attack_logs_collection = db['user_attack_logs']
 allowed_groups_collection = db['allowed_groups']  # New collection for allowed groups
 
 # Bot Configuration
-TELEGRAM_BOT_TOKEN = '8012442954:AAEeWJ4wyOgCcZr6FoDsq9VrNgkFq8t2VYI'
+TELEGRAM_BOT_TOKEN = '8012442954:AAEfuznuwLgG8PDgQIsI6RldXVeNuBIXtyw'
 ADMIN_USER_ID = 1929943036 
 ADMIN_USER_ID = 1929943036 
 FEEDBACK_CHAT_ID = 1929943036  # Yahan admin ka Telegram ID set karein
