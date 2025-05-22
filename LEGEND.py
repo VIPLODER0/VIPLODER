@@ -579,50 +579,111 @@ async def show_settings(update: Update, context: CallbackContext):
 
     await context.bot.send_message(chat_id=update.effective_chat.id, text=settings_text, parse_mode='Markdown')
 
-async def list_users(update, context):
-    current_time = datetime.now(timezone.utc)
-    users = users_collection.find() 
-    
-    user_list_message = "👥 User List:\n"
-    
-    for user in users:
-        user_id = user['user_id']
-        expiry_date = user['expiry_date']
-        if expiry_date.tzinfo is None:
-            expiry_date = expiry_date.replace(tzinfo=timezone.utc)
-    
-        time_remaining = expiry_date - current_time
-        if time_remaining.days < 0:
-            remaining_days = -0
-            remaining_hours = 0
-            remaining_minutes = 0
-            expired = True  
-        else:
-            remaining_days = time_remaining.days
-            remaining_hours = time_remaining.seconds // 3600
-            remaining_minutes = (time_remaining.seconds // 60) % 60
-            expired = False 
-        
-        expiry_label = f"{remaining_days}D-{remaining_hours}H-{remaining_minutes}M"
-        if expired:
-            user_list_message += f"🔴 *User ID: {user_id} - Expiry: {expiry_label}*\n"
-        else:
-            user_list_message += f"🟢 User ID: {user_id} - Expiry: {expiry_label}\n"
+async def list_users(update: Update, context: CallbackContext):
+    user_id = update.effective_user.id
+    chat_id = update.effective_chat.id
+    print(f"[DEBUG] /users command invoked by user_id: {user_id}, chat_id: {chat_id}")
 
-    await context.bot.send_message(chat_id=update.effective_chat.id, text=user_list_message, parse_mode='Markdown')
+    if user_id != ADMIN_USER_ID:
+        print(f"[DEBUG] User {user_id} is not admin, sending unauthorized message")
+        await context.bot.send_message(
+            chat_id=chat_id,
+            text="*❌ You are not authorized to view user list!*",
+            parse_mode='Markdown'
+        )
+        return
 
-async def is_user_allowed(user_id):
-    user = users_collection.find_one({"user_id": user_id})
-    if user:
-        expiry_date = user['expiry_date']
-        if expiry_date:
-            # Ensure expiry_date is timezone-aware
-            if expiry_date.tzinfo is None:
-                expiry_date = expiry_date.replace(tzinfo=timezone.utc)
-            # Compare with the current time
-            if expiry_date > datetime.now(timezone.utc):
-                return True
-    return False
+    try:
+        client.admin.command('ping')
+        print("[DEBUG] MongoDB connection successful")
+    except Exception as e:
+        print(f"[ERROR] MongoDB connection failed: {str(e)}")
+        await context.bot.send_message(
+            chat_id=chat_id,
+            text="*❌ Database connection error. Please try again later.*",
+            parse_mode='Markdown'
+        )
+        return
+
+    try:
+        users = list(users_collection.find())
+        print(f"[DEBUG] Found {len(users)} users in database")
+
+        if not users:
+            print("[DEBUG] No users found, sending empty collection message")
+            await context.bot.send_message(
+                chat_id=chat_id,
+                text="*⚠️ No users found in the database.*",
+                parse_mode='Markdown'
+            )
+            return
+
+        user_list_message = "👥 *User List:*\n\n"
+        current_time = datetime.now(timezone.utc)
+
+        for user in users:
+            user_id = user.get('user_id', 'Unknown')
+            expiry_date = user.get('expiry_date')
+            print(f"[DEBUG] Processing user: {user_id}")
+
+            try:
+                tg_user = await context.bot.get_chat(user_id)
+                user_name = tg_user.username if tg_user.username else tg_user.first_name
+                user_name = f"@{user_name}" if tg_user.username else user_name or "Unknown"
+            except Exception as e:
+                print(f"[ERROR] Failed to fetch Telegram user info for {user_id}: {str(e)}")
+                user_name = "Unknown"
+
+            if not expiry_date or not isinstance(expiry_date, datetime):
+                expiry_label = "Invalid Date"
+                expired = True
+            else:
+                if expiry_date.tzinfo is None:
+                    expiry_date = expiry_date.replace(tzinfo=timezone.utc)
+                expiry_date_local = expiry_date.astimezone(LOCAL_TIMEZONE)
+                expiry_label = expiry_date_local.strftime("%Y-%m-%d %H:%M:%S %Z")
+                time_remaining = expiry_date - current_time
+                if time_remaining.total_seconds() < 0:
+                    expiry_label += " (Expired)"
+                    expired = True
+                else:
+                    days = time_remaining.days
+                    hours = time_remaining.seconds // 3600
+                    minutes = (time_remaining.seconds // 60) % 60
+                    expiry_label += f" ({days}D-{hours}H-{minutes}M remaining)"
+                    expired = False
+
+            status = "🔴" if expired else "🟢"
+            user_list_message += (
+                f"{status} *User ID*: {user_id}\n"
+                f"   *Name*: {user_name}\n"
+                f"   *Expiry*: {expiry_label}\n\n"
+            )
+
+            if len(user_list_message) > 3500:
+                print(f"[DEBUG] Sending message chunk due to length: {len(user_list_message)}")
+                await context.bot.send_message(
+                    chat_id=chat_id,
+                    text=user_list_message,
+                    parse_mode='Markdown'
+                )
+                user_list_message = "👥 *User List (Continued):*\n\n"
+
+        if user_list_message != "👥 *User List (Continued):*\n\n":
+            print(f"[DEBUG] Sending final message, length: {len(user_list_message)}")
+            await context.bot.send_message(
+                chat_id=chat_id,
+                text=user_list_message,
+                parse_mode='Markdown'
+            )
+
+    except Exception as e:
+        print(f"[ERROR] Failed to fetch users: {str(e)}")
+        await context.bot.send_message(
+            chat_id=chat_id,
+            text=f"*❌ Error fetching user list: {str(e)}*",
+            parse_mode='Markdown'
+        )
     
 #Function to broadcast messege 
 async def broadcast(update: Update, context: CallbackContext):
