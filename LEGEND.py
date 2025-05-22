@@ -579,64 +579,7 @@ async def show_settings(update: Update, context: CallbackContext):
 
     await context.bot.send_message(chat_id=update.effective_chat.id, text=settings_text, parse_mode='Markdown')
 
-async def list_users(update: Update, context: CallbackContext):
-    user_id = update.effective_user.id
-    chat_id = update.effective_chat.id
-    print(f"[DEBUG] /users command invoked by user_id: {user_id}, chat_id: {chat_id}")
-
-    if user_id != ADMIN_USER_ID:
-        print(f"[DEBUG] User {user_id} is not admin, sending unauthorized message")
-        await context.bot.send_message(
-            chat_id=chat_id,
-            text="*❌ You are not authorized to view user list!*",
-            parse_mode='Markdown'
-        )
-        return
-
-    try:
-        client.admin.command('ping')
-        print("[DEBUG] MongoDB connection successful")
-    except Exception as e:
-        print(f"[ERROR] MongoDB connection failed: {str(e)}")
-        await context.bot.send_message(
-            chat_id=chat_id,
-            text="*❌ Database connection error. Please try again later.*",
-            parse_mode='Markdown'
-        )
-        return
-
-    try:
-        users = list(users_collection.find())
-        print(f"[DEBUG] Found {len(users)} users in database")
-
-        if not users:
-            print("[DEBUG] No users found, sending empty collection message")
-            await context.bot.send_message(
-                chat_id=chat_id,
-                text="*⚠️ No users found in the database.*",
-                parse_mode='Markdown'
-            )
-            return
-
-        user_list_message = "👥 *User List:*\n\n"
-        current_time = datetime.now(timezone.utc)
-
-        for user in users:
-            user_id = user.get('user_id', 'Unknown')
-            expiry_date = user.get('expiry_date')
-            print(f"[DEBUG] Processing user: {user_id}")
-
-            try:
-                tg_user = await context.bot.get_chat(user_id)
-                user_name = tg_user.username if tg_user.username else tg_user.first_name
-                user_name = f"@{user_name}" if tg_user.username else user_name or "Unknown"
-            except Exception as e:
-                print(f"[ERROR] Failed to fetch Telegram user info for {user_id}: {str(e)}")
-                user_name = "Unknown"
-
-            if not expiry_date or not isinstance(expiry_date, datetime):
-                expiry_label = "Invalid Date"
-async def list_users(update, context):
+#user list 
 async def list_users(update, context):
     current_time = datetime.now(timezone.utc)
     users = users_collection.find() 
@@ -663,12 +606,12 @@ async def list_users(update, context):
         
         expiry_label = f"{remaining_days}D-{remaining_hours}H-{remaining_minutes}M"
         if expired:
-            user_list_message += f"🔴 *User ID: {user_id} - Expiry: {expiry_label}*\n"
+            user_list_message += f"🔴 User ID: {user_id} - Expiry: {expiry_label}\n"
         else:
             user_list_message += f"🟢 User ID: {user_id} - Expiry: {expiry_label}\n"
 
     await context.bot.send_message(chat_id=update.effective_chat.id, text=user_list_message, parse_mode='Markdown')
-
+    
 async def is_user_allowed(user_id):
     user = users_collection.find_one({"user_id": user_id})
     if user:
