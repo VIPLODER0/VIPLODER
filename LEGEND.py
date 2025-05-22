@@ -1554,7 +1554,7 @@ def main():
     application.add_handler(CommandHandler("spin", spin))
     application.add_handler(CommandHandler("price", price))  # For users to see the promotional plan
     application.add_handler(CommandHandler("argument", set_argument))
-    application.add_handler(CommandHandler("addgroup", addgroup))
+    application.add_handler(CommandHandler("addgroup", add_group))
     application.add_handler(CommandHandler("status", status))
     application.add_handler(CommandHandler("delete_code", delete_code))
     application.add_handler(CommandHandler("list_codes", list_codes))
