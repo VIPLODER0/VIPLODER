@@ -25,7 +25,7 @@ attack_logs_collection = db['user_attack_logs']
 allowed_groups_collection = db['allowed_groups']  # New collection for allowed groups
 
 # Bot Configuration
-TELEGRAM_BOT_TOKEN = '8012442954:AAEfuznuwLgG8PDgQIsI6RldXVeNuBIXtyw'
+TELEGRAM_BOT_TOKEN = '8012442954:AAFPKXAOrawnF7tqmxZKFE1Uh1YmFUKzaJU'
 ADMIN_USER_ID = 1929943036 
 ADMIN_USER_ID = 1929943036 
 FEEDBACK_CHAT_ID = 1929943036  # Yahan admin ka Telegram ID set karein
@@ -438,10 +438,10 @@ async def start(update: Update, context: CallbackContext):
     status_emoji = "🟢 Approved" if is_allowed else "⚠️ Not Approved"
 
     message = (
-        f"⚡ Welcome to the battlefield, *{username.upper()}*! ⚡\n\n"
-        f"👤 *User ID:* `{user_id}`\n"
-        f"🔴 *Status:* {status_emoji}\n\n"
-        f"💰 *Pricing for the bot services:* /price"
+        f"⚡ Welcome to the battlefield, {username.upper()}! ⚡\n\n"
+        f"👤 User ID: {user_id}\n"
+        f"🔴 Status: {status_emoji}\n\n"
+        f"💰 Pricing for the bot services: /price"
     )
 
     await context.bot.send_message(chat_id=chat_id, text=message, parse_mode='HTML')
@@ -822,16 +822,17 @@ async def broadcast_message(update: Update, context: CallbackContext):
 # function to plan 
 async def price(update: Update, context: CallbackContext):
     message = (
-        "💸 Bot Pricing Plans:\n\n"
-        "👑 1 DAY –  120₹ 💎\n"
-        "👑 2 DAYS – 200₹ 💎\n"
-        "👑 3 DAYS – 300₹ 💎\n"
-        "👑 4 DAYS – 400₹ 💎\n"
-        "👑 5 DAYS – 500₹ 💎\n"
-        "👑 6 DAYS – 600₹ 💎\n"
-        "👑 7 DAYS – 700₹ 💎\n\n"
+        f"⚡ Hello, {username.upper()}! ⚡\n\n"
+        "💸 💰 Pricing for the bot services:\n\n"
+        "👑 1 DAY:  120₹ 💵\n"
+        "👑 2 DAY:  190₹ 💵\n"
+        "👑 3 DAY:  280₹ 💵\n"
+        "👑 4 DAY:  350₹ 💵\n"
+        "👑 5 DAY:  400₹ 💵\n"
+        "👑 6 DAY:  450₹ 💵\n"
+        "👑 7 DAY:  500₹ 💵\n\n"
         "📱 Available on: IOS + Android\n\n"
-        "💬 Contact to Buy: @Jon00897 "
+        " 🔐 For private inquiries, reach out to the owners: @Jon00897 :"
     )
 
     await context.bot.send_message(chat_id=update.effective_chat.id, text=message, parse_mode='HTML')
