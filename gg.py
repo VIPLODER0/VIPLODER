@@ -25,7 +25,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 logger = logging.getLogger(__name__)
 
 # Bot configuration
-TOKEN = "YOUR_BOT_TOKEN_HERE"  # Replace with your bot token
+TOKEN = "8184454315:AAG7NZudClTHzw8p_fGl5kgPz6615saOTrQ"  # Replace with your bot token
 ADMIN_USERNAME = "@Jon00897"  # Admin who generates keys
 PRICE_PER_MONTH = 50  # Price in USD per month
 REDIS_HOST = "localhost"
