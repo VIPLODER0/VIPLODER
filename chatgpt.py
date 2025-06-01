@@ -1,7 +1,7 @@
 import telebot
 import requests
 import json
-bot = telebot.TeleBot(input("token: "))
+bot = telebot.TeleBot(input("8018753837:AAEOtjfr3-mZw8PTH02p77gSEg1Rtk7Kosc"))
 def GOJO(user_input):
     url = "https://api.binjie.fun/api/generateStream"
     payload = json.dumps({
@@ -25,7 +25,7 @@ def GOJO(user_input):
   'sec-fetch-mode': "cors",
   'sec-fetch-dest': "empty",
   'referer': "https://chat18.aichatos8.com/",
-  'accept-language': "ar-EG,ar;q=0.9,en-US;q=0.8,en;q=0.7",
+  'accept-language': "ar-EG,ar;q=0.9,en-US;q=0.8,en;q=0.7,hi;q=0.6"
   'priority': "u=1, i"
 
     }
