@@ -41,7 +41,7 @@ if payment['status'] == 'captured':
     txn_history_collection.update_one({"order_id": order_id}, {"$set": {"status": "success"}})
     await context.bot.send_message(chat_id=chat_id, text=f"*✅ Payment Verified!*\nYou now have access for {days} day(s)!", parse_mode='Markdown')
 # Bot Configuration
-TELEGRAM_BOT_TOKEN = '7516323992:AAFU8SdUJWeWfuuvFYtEU3GUSZDtaW5g5As'
+TELEGRAM_BOT_TOKEN = '7516323992:AAH8tuZORrUo3sWBqQvOrrz1xXlpmOaS6wE'
 ADMIN_USER_ID = 1929943036
 FEEDBACK_CHAT_ID = 1929943036
 COOLDOWN_PERIOD = timedelta(minutes=5)
@@ -180,7 +180,7 @@ async def add_group(update: Update, context: CallbackContext):
         time_input = context.args[1]
         if time_input[-1].lower() == 'd':
             time_value = int(time_input[:-1])
-            total_seconds = time_value  86400
+            total_seconds = time_value * 86400
             expiry_label = f"{time_value} day(s)"
         elif time_input[-1].lower() == 'm':
             time_value = int(time_input[:-1])
