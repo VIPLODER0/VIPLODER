@@ -305,38 +305,55 @@ async def start(update: Update, context: CallbackContext):
 async def add_user(update: Update, context: CallbackContext):
     user_id = update.effective_user.id
     if user_id != ADMIN_USER_ID:
-        await context.bot.send_message(chat_id=update.effective_chat.id, text="❌ You are not authorized to add users!", parse_mode='Markdown')
+        await context.bot.send_message(chat_id=update.effective_chat.id, text="*❌ You are not authorized to add users!*", parse_mode='Markdown')
         return
-    if len(context.args) != 2:
-        await context.bot.send_message(chat_id=update.effective_chat.id, text="⚠️ Usage: /add <user_id> <days/minutes>", parse_mode='Markdown')
-        return
-    target_user_id = int(context.args[0])
-    time_input = context.args[1]
-    if time_input[-1].lower() == 'd':
-        time_value = int(time_input[:-1])
-        total_seconds = time_value  86400
-    elif time_input[-1].lower() == 'm':
-        time_value = int(time_input[:-1])
-        total_seconds = time_value  60
-    else:
-        await context.bot.send_message(chat_id=update.effective_chat.id, text="⚠️ Please specify time in days (d) or minutes (m).", parse_mode='Markdown')
-        return
-    expiry_date = datetime.now(timezone.utc) + timedelta(seconds=total_seconds)
-    users_collection.update_one({"user_id": target_user_id}, {"$set": {"expiry_date": expiry_date}}, upsert=True)
-    await context.bot.send_message(chat_id=update.effective_chat.id, text=f"✅ User {target_user_id} added with expiry in {time_value} {time_input[-1]}.", parse_mode='Markdown')
 
-# Remove user
+    if len(context.args) != 2:
+        await context.bot.send_message(chat_id=update.effective_chat.id, text="*⚠️ Usage: /add <user_id> <days/minutes>*", parse_mode='Markdown')
+        return
+
+    target_user_id = int(context.args[0])
+    time_input = context.args[1]  # The second argument is the time input (e.g., '2m', '5d')
+
+    # Extract numeric value and unit from the input
+    if time_input[-1].lower() == 'd':
+        time_value = int(time_input[:-1])  # Get all but the last character and convert to int
+        total_seconds = time_value * 86400  # Convert days to seconds
+    elif time_input[-1].lower() == 'm':
+        time_value = int(time_input[:-1])  # Get all but the last character and convert to int
+        total_seconds = time_value * 60  # Convert minutes to seconds
+    else:
+        await context.bot.send_message(chat_id=update.effective_chat.id, text="*⚠️ Please specify time in days (d) or minutes (m).*", parse_mode='Markdown')
+        return
+
+    expiry_date = datetime.now(timezone.utc) + timedelta(seconds=total_seconds)  # Updated to use timezone-aware UTC
+
+    # Add or update user in the database
+    users_collection.update_one(
+        {"user_id": target_user_id},
+        {"$set": {"expiry_date": expiry_date}},
+        upsert=True
+    )
+
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=f"*✅ User {target_user_id} added with expiry in {time_value} {time_input[-1]}.*", parse_mode='Markdown')
+
 async def remove_user(update: Update, context: CallbackContext):
     user_id = update.effective_user.id
     if user_id != ADMIN_USER_ID:
-        await context.bot.send_message(chat_id=update.effective_chat.id, text="❌ You are not authorized to remove users!", parse_mode='Markdown')
+        await context.bot.send_message(chat_id=update.effective_chat.id, text="*❌ You are not authorized to remove users!*", parse_mode='Markdown')
         return
+
     if len(context.args) != 1:
-        await context.bot.send_message(chat_id=update.effective_chat.id, text="⚠️ Usage: /remove <user_id>", parse_mode='Markdown')
+        await context.bot.send_message(chat_id=update.effective_chat.id, text="*⚠️ Usage: /remove <user_id>*", parse_mode='Markdown')
         return
+
     target_user_id = int(context.args[0])
+    
+    # Remove user from the database
     users_collection.delete_one({"user_id": target_user_id})
-    await context.bot.send_message(chat_id=update.effective_chat.id, text=f"✅ User {target_user_id} removed.", parse_mode='Markdown')
+
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=f"*✅ User {target_user_id} removed.*", parse_mode='Markdown')
+
 
 # Set threads
 async def set_thread(update: Update, context: CallbackContext):
