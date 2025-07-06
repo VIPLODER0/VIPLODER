@@ -4,9 +4,9 @@ import yt_dlp
 import instaloader
 
 # Replace with your credentials
-API_ID = "YOUR_API_ID"
-API_HASH = "YOUR_API_HASH"
-BOT_TOKEN = "YOUR_BOT_TOKEN"
+API_ID = "24436545"
+API_HASH = "afa5558d3561cb2241ed836088b56098"
+BOT_TOKEN = "7917489800:AAGMsgg7pqeGvZekoL6w-0dWuvKJeba2kp0"
 
 # Bot Setup
 bot = Client("video_downloader_bot", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
