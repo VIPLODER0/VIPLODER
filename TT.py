@@ -6,7 +6,7 @@ from pyrogram.types import Message
 # 🔐 Your Telegram Bot API credentials
 API_ID = 24436545   # replace with your API_ID
 API_HASH = "afa5558d3561cb2241ed836088b56098"
-BOT_TOKEN = "7754507016:AAEqdRovzYxF4dhGfho-1LgIH64X4gMSHFM"
+BOT_TOKEN = "7837969823:AAEuB9mKonsxIhea7-_6F_CeOBESIBBXwCo"
 
 app = Client("aar_bot", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
 
