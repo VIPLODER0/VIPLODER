@@ -18,8 +18,8 @@ from pyrogram import Client, filters
 # Replace with your own API ID, API Hash, Bot Token, and Owner's Username
 API_ID = "24436545"
 API_HASH = "afa5558d3561cb2241ed836088b56098"
-BOT_TOKEN = "7837969823:AAG3Iwsls_LYKvBiv7tGd6mDP2kxnWhF6Kw"
-OWNER_USERNAME = "Jon00897"  # Replace with your username (without @)
+BOT_TOKEN = "7837969823:AAFmJGHF5QCigG3mu6BtzjTL-q_sEyZwpnQ"
+OWNER_USERNAME = "@LEGENDBHAI012"  # Replace with your username (without @)
 
 app = Client("encryption_bot", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
 
