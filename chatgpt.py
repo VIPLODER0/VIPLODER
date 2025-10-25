@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 
 # .env फाइल से टोकन लोड करें
 load_dotenv()
-BOT_TOKEN = os.getenv("BOT_TOKEN")  # .env फाइल से टोकन पढ़ता है
+BOT_TOKEN = os.getenv("8018753837:AAG_eL3C8iUEm4XxUxfBtbcs-mcf0j7EmPg")  # .env फाइल से टोकन पढ़ता है
 
 # बॉट शुरू करें
 bot = telebot.TeleBot(BOT_TOKEN)
