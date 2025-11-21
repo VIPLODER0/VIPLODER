@@ -12,7 +12,7 @@ from pymongo import MongoClient
 from datetime import datetime, timedelta, timezone
 
 # Database Configuration
-MONGO_URI = 'mongodb+srv://moviemixvibes_db_user:yMUHG056cT6tFt8i@cluster0.dt71agq.mongodb.net/?appName=Cluster0'
+MONGO_URI = 'mongodb+srv://Magic:Spike@cluster0.fa68l.mongodb.net/TEST?retryWrites=true&w=majority&appName=Cluster0'
 client = MongoClient(MONGO_URI)
 db = client['TEST']
 users_collection = db['users']
@@ -1078,5 +1078,6 @@ def main():
 
 if __name__ == '__main__':
     main()
+
 
 
