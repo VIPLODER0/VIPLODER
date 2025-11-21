@@ -9,8 +9,8 @@
 #include <time.h>
 
 // Define expiration date
-#define EXPIRATION_YEAR 2025
-#define EXPIRATION_MONTH 12 // October
+#define EXPIRATION_YEAR 2026
+#define EXPIRATION_MONTH 12 // desember
 #define EXPIRATION_DAY 2   // 31st
 
 // Structure to store attack parameters
@@ -143,3 +143,4 @@ int main(int argc, char *argv[]) {
     printf("Attack finished. All threads stopped.\n");
     return 0;
 }
+
