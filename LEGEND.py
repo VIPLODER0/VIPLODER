@@ -12,7 +12,7 @@ from pymongo import MongoClient
 from datetime import datetime, timedelta, timezone
 
 # Database Configuration
-MONGO_URI = 'mongodb+srv://nedop17612:ZnXnERM6swVt16gc@cluster0.hhq4k.mongodb.net/TEST?retryWrites=true&w=majority&appName=Cluster0'
+MONGO_URI = 'mongodb+srv://pifowo6717_db_user:pifowo6717_db_user@cluster0.9j5ea8r.mongodb.net/?appName=Cluster0'
 client = MongoClient(MONGO_URI)
 db = client['TEST']
 users_collection = db['users']
@@ -21,7 +21,7 @@ redeem_codes_collection = db['redeem_codes']
 attack_logs_collection = db['user_attack_logs']
 
 # Bot Configuration
-TELEGRAM_BOT_TOKEN = '8081289047:AAGJgN9i2A80_20ONBjWuhla_SUKUxud2d4'
+TELEGRAM_BOT_TOKEN = '8081289047:AAEfGoKZAgWiXaJ83Ie4vDymB1nob3gQ29w'
 ADMIN_USER_ID = 1929943036 
 ADMIN_USER_ID = 1929943036 
 COOLDOWN_PERIOD = timedelta(minutes=1) 
@@ -1078,6 +1078,7 @@ def main():
 
 if __name__ == '__main__':
     main()
+
 
 
 
