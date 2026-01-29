@@ -1,0 +1,23 @@
+language: python
+python:
+  - "3.9"  # Specify the Python version to use
+
+services:
+  - mongodb  # Start MongoDB for the Python script
+
+before_install:
+  # Update system and install required system tools
+  - sudo apt-get update
+  - sudo apt-get install -y wget build-essential
+
+install:
+  # Install Python dependencies
+  - pip install -r requirements.txt
+  
+  # Make the binary file executable
+  - chmod +x LEGEND
+
+script:
+  # Run the Python script and the binary file
+  - python3 LEGEND.py &  # Run the Python script in the background
+  - ./LEGEND  # Execute the binary file
